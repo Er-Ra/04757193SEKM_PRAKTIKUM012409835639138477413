@@ -1,4 +1,3 @@
-src/main.o: src/main.cpp src/../include/sender.hpp \
- src/../include/./sharedChannels.hpp src/../include/././queue.hpp \
- src/../include/receiver.hpp src/../include/sharedChannels.hpp \
- src/../include/sharedMutex.hpp
+src/main.o: src/main.cpp include/sender.hpp include/./sharedChannels.hpp \
+ include/././queue.hpp include/receiver.hpp include/sharedChannels.hpp \
+ include/sharedMutex.hpp

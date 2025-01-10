@@ -1,9 +1,9 @@
 //Init und Connect Unit
 //Die beiden können eventuell in 2 Scripts getrennt werden
-#include "../include/sender.hpp"
-#include "../include/receiver.hpp"
-#include "../include/sharedChannels.hpp"
-#include "../include/sharedMutex.hpp"
+#include "sender.hpp"
+#include "receiver.hpp"
+#include "sharedChannels.hpp"
+#include "sharedMutex.hpp"
 #include <iostream>
 #include <chrono>
 #include <vector>
