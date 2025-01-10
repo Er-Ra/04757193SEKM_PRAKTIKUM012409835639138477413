@@ -4,6 +4,7 @@
 #include "receiver.hpp"
 #include "sharedChannels.hpp"
 #include "sharedMutex.hpp"
+#include "Logger.cpp"
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -53,6 +54,11 @@ SharedChannels* sc = SharedChannels::getSharedChannels();
 
 int main() {
 
+    AsyncLogger logger("async_log_linked_list.txt");
+
+    thread t1([&logger]() { logger.thread_function("Message 1"); });
+    t1.join();
+    
     //LINKING
     //channel creation
     sc->addChannel(1);
@@ -74,7 +80,7 @@ int main() {
         sender2->start(&threads);
         receiver1->start(&threads);
         receiver2->start(&threads); //possible to automize this with a loop. Make sender/receiver 
-                                    //to have same base class, factory pattern possible
+                                            //to have same base class, factory pattern possible
 
         for (auto& thread : threads) { 
             if (thread.joinable()) { thread.join(); }

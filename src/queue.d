@@ -1,1 +1,1 @@
-src/queue.o: src/queue.cpp src/../include/queue.hpp
+src/queue.o: src/queue.cpp include/queue.hpp

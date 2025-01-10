@@ -1,2 +1,2 @@
-src/sharedChannels.o: src/sharedChannels.cpp \
- src/../include/sharedChannels.hpp src/../include/./queue.hpp
+src/sharedChannels.o: src/sharedChannels.cpp include/sharedChannels.hpp \
+ include/./queue.hpp

@@ -1,4 +1,10 @@
 {
     "makefile.makefilePath": "${workspaceFolder}/Makefile",
-    "makefile.buildLog": ""
+    "makefile.buildLog": "",
+    "files.associations": {
+        "new": "cpp",
+        "fstream": "cpp",
+        "string": "cpp",
+        "format": "cpp"
+    }
 }
