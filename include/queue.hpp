@@ -11,16 +11,19 @@ public:
     QueueClass(int,int);
     ~QueueClass();
 
-    void enqueue(std::string);
-    void dequeue(void);
-    std::string getFront();
+    //Functions
+    void enqueue(std::string); //in die Queue schreiben
+    void dequeue(void); //von der Queue löschen
+    std::string getFront(); //von der Queue lesen
+    bool get_isEmpty();
 
 private:
     // Member variables
-    int receiverID;
+    void set_isEmpty(bool);
     std::vector<std::string> queue;
     int slotsNumber;
-    int elementsPerSlot;
+    int slotLength;
+    bool isEmpty;
 };
 
 #endif // QUEUE_CLASS

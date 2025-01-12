@@ -1,6 +1,6 @@
 //RecvUnit
-#include "sender.hpp"
-#include "sharedMutex.hpp"
+#include "../include/sender.hpp"
+#include "../include/sharedMutex.hpp"
 
 SenderClass::SenderClass(int senderID, std::function<void(SenderClass*)> grayFunc){
     this->senderID = senderID;
@@ -8,12 +8,16 @@ SenderClass::SenderClass(int senderID, std::function<void(SenderClass*)> grayFun
 }
 
 void SenderClass::joinToChannel(int channelID){
-    SharedChannels* sc = SharedChannels::getSharedChannels();
-    this->senderChannel = sc->getChannel(channelID); //exception for when channel does not exist
+    ConnectUnit* cu = ConnectUnit::getConnectUnit();
+    cu->connectSenderToChannel(&this->joinedChannels, channelID);
 }
 
-void SenderClass::write(std::string message){
-    this->senderChannel->channelQueue->enqueue(message);
+void SenderClass::write(std::string message){ 
+    SharedChannels* sc = SharedChannels::getSharedChannels();
+    for (int channelNumber = 0; channelNumber < this->joinedChannels.size(); channelNumber++){
+        int channelID = this->joinedChannels[channelNumber];
+        sc->getChannel(channelID)->writeToChannel(message); 
+    }
 }
 
 void SenderClass::start(std::vector<std::thread>* threads){

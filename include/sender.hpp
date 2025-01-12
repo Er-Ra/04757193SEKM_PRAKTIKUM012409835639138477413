@@ -7,6 +7,7 @@
 #include <thread>
 #include <functional>
 #include "./sharedChannels.hpp"
+#include "./connectUnit.hpp"
 
 class SenderClass {
 public:
@@ -24,7 +25,7 @@ public:
 private:
     // Member variables
     int senderID;
-    Channel* senderChannel;
+    std::vector<int> joinedChannels;
 
     // Functions
     std::function<void(SenderClass*)> grayFunc;

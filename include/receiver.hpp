@@ -7,11 +7,13 @@
 #include <thread>
 #include <functional>
 #include "./sharedChannels.hpp"
+#include "./connectUnit.hpp"
+#include "./translatedMessage.hpp"
 
 class ReceiverClass {
 public:
     // Constructors
-    ReceiverClass(int, std::function<void(ReceiverClass*)>);
+    ReceiverClass(int, std::string, std::function<void(ReceiverClass*)>);
 
     // Destructor
     ~ReceiverClass();
@@ -19,12 +21,14 @@ public:
     // Member functions
     void joinToChannel(int);
     void start(std::vector<std::thread>* threads);
-    std::string read();
+    TranslatedMessage* read();
     
 private:
     // Variables
     int receiverID;
-    Channel* receiverChannel;
+    std::vector<int> joinedChannels;
+    std::string receiverFormat;
+    TranslatedMessage* receiverMessage;
 
     // Functions
     std::function<void(ReceiverClass*)> grayFunc;

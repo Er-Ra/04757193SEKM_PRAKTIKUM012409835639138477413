@@ -1,22 +1,28 @@
 //RecvUnit
-#include "receiver.hpp"
-#include "sharedChannels.hpp"
-#include "sharedMutex.hpp"
+#include "../include/receiver.hpp"
+#include "../include/sharedMutex.hpp"
 
-ReceiverClass::ReceiverClass(int receiverID, std::function<void(ReceiverClass*)> grayFunc){
+ReceiverClass::ReceiverClass(int receiverID, std::string receiverFormat, std::function<void(ReceiverClass*)> grayFunc){
     this->receiverID = receiverID;
     this->grayFunc = grayFunc;
+    this->receiverFormat = receiverFormat;
 }
 
 void ReceiverClass::joinToChannel(int channelID){
-    SharedChannels* sc = SharedChannels::getSharedChannels();
-    this->receiverChannel = sc->getChannel(channelID); //exception for when channel does not exist
+    ConnectUnit* cu = ConnectUnit::getConnectUnit();
+    cu->connectReceiverToChannel(&this->joinedChannels, channelID);
 }
 
-std::string ReceiverClass::read(){
-    std::string message;
-    message = this->receiverChannel->channelQueue->getFront();
-    this->receiverChannel->channelQueue->dequeue();
+TranslatedMessage* ReceiverClass::read(){
+    SharedChannels* sc = SharedChannels::getSharedChannels();
+    TranslatedMessage* message;
+    for (int channelNumber = 0; channelNumber < this->joinedChannels.size(); channelNumber++){
+        int channelID = this->joinedChannels[channelNumber];
+        message = sc->getChannel(channelID)->readFromChannel(this->receiverFormat);
+        
+        if(sc->getChannel(channelID)->get_deleteRequest() == true && sc->getChannel(channelID)->get_isEmpty())
+            sc->deleteChannel(channelID);
+    }
     return message;
 }
 

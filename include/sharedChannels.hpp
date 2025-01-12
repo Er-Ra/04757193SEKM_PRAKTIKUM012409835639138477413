@@ -5,24 +5,22 @@
 #include <string>
 #include <vector>
 #include "./queue.hpp"
-
-struct Channel { 
-    int channelID;
-    QueueClass* channelQueue;
-};
+#include "./channel.hpp"
+#include "./connectUnit.hpp"
 
 class SharedChannels{
 public:
     static SharedChannels* getSharedChannels();
-    Channel* getChannel(int);
-    void addChannel(int);
+    ChannelClass* getChannel(int);
+    std::vector<int> getChannelIDs();
+    void addChannel(int, int, int);
     void deleteChannel(int);
 
 private:
     static SharedChannels* mySharedChannels;
     SharedChannels();
 
-    std::vector<Channel> channels;
+    std::vector<ChannelClass*> channels;
 };
 
 #endif // CHANNELS_CLASS
