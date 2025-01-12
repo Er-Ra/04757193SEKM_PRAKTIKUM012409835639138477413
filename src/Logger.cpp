@@ -89,7 +89,7 @@ public:
         if(!log_file.is_open()){
             for (long i = 0; !log_file.is_open(); i++)
             {   log_file.close();
-                std::string filename_i = filename + std::to_string(i);
+                std::string filename_i = filename.substr(0,filename.size()-4) + std::to_string(i) +".txt";
                 log_file.open(filename_i, std::ios::out | std::ios::app);
             }
         }
