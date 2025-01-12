@@ -1,6 +1,5 @@
 //Init und Connect Unit
 //Die beiden können eventuell in 2 Scripts getrennt werden
-#include "include/Logger.hpp"
 #include "sender.hpp"
 #include "receiver.hpp"
 #include "sharedChannels.hpp"
@@ -55,10 +54,10 @@ SharedChannels* sc = SharedChannels::getSharedChannels();
 
 int main() {
 
-    AsyncLogger& logger = AsyncLogger::getInstance("singleton_log_0.json", 400, false, 10000);
+    AsyncLogger logger("async_log_linked_list.txt");
 
-    //thread t1([&logger]() { logger.thread_function("Message 1"); });
-    //t1.join();
+    thread t1([&logger]() { logger.thread_function("Message 1"); });
+    t1.join();
     
     //LINKING
     //channel creation

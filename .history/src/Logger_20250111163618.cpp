@@ -187,3 +187,16 @@ for (int i = 0; i < 5; ++i) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 }
+
+int main() {
+//AsyncLogger logger("async_log_linked_list_0.json", 200, 1, 10000);
+AsyncLogger& logger = AsyncLogger::getInstance("singleton_log_0.json", 400, false, 10000);
+
+std::thread t1(thread_function, std::ref(logger), "Message 1");
+std::thread t2(thread_function, std::ref(logger), "Message 2");
+
+t1.join();
+t2.join();
+
+return 0;
+}
