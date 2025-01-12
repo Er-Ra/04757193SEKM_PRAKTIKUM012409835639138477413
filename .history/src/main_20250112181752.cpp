@@ -1,6 +1,5 @@
 //Init und Connect Unit
 //Die beiden können eventuell in 2 Scripts getrennt werden
-#include "include/Logger.hpp"
 #include "sender.hpp"
 #include "receiver.hpp"
 #include "sharedChannels.hpp"
@@ -32,7 +31,7 @@ void customSender2(SenderClass* sender){
 
 //sender initialization
 SenderClass* sender1 = new SenderClass(1, customSender1);
-SenderClass* sender2 = new SenderClass(2, customSender2);
+SenderClass* sender2 = new SenderClass(2, customSender2); 
 
 //define grayFuncs for receivers
 void customReceiver1(ReceiverClass* receiver){
