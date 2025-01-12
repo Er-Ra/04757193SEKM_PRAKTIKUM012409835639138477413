@@ -92,20 +92,6 @@ AsyncLogger::AsyncLogger(const std::string& filename, const int file_length_byte
     open_file(filename);
     if (max_log_size_byte < max_file_length_byte) { //Check file sizes and set to smaller if log is smaller
         max_file_length_byte = max_log_size_byte;
-        log_file.open(filename, std::ios::out | std::ios::app);
-        
-        if(!log_file.is_open()){
-            for (long i = 0; !log_file.is_open(); i++)
-            {   log_file.close();
-                std::string filename_i = filename.substr(0,filename.size()-4) + std::to_string(i) +".txt";
-                log_file.open(filename_i, std::ios::out | std::ios::app);
-            }
-        }
-        /*
-        if (!log_file.is_open()) {
-            throw std::ios_base::failure("Failed to open log file");
-        }*/
-
     }
     if (!log_file.is_open()) {
         throw std::ios_base::failure("Failed to open log file");
