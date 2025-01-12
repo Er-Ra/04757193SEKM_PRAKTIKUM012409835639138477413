@@ -1,7 +1,6 @@
 //Init und Connect Unit
 //Die beiden können eventuell in 2 Scripts getrennt werden
-#include "include/Logger.hpp"
-#include "sender.hpp"
+#include "...\include\sender.hpp"
 #include "receiver.hpp"
 #include "sharedChannels.hpp"
 #include "sharedMutex.hpp"
@@ -32,7 +31,7 @@ void customSender2(SenderClass* sender){
 
 //sender initialization
 SenderClass* sender1 = new SenderClass(1, customSender1);
-SenderClass* sender2 = new SenderClass(2, customSender2);
+SenderClass* sender2 = new SenderClass(2, customSender2); 
 
 //define grayFuncs for receivers
 void customReceiver1(ReceiverClass* receiver){
@@ -55,10 +54,10 @@ SharedChannels* sc = SharedChannels::getSharedChannels();
 
 int main() {
 
-    AsyncLogger& logger = AsyncLogger::getInstance("singleton_log_0.json", 400, false, 10000);
+    AsyncLogger logger("async_log_linked_list.txt");
 
-    //thread t1([&logger]() { logger.thread_function("Message 1"); });
-    //t1.join();
+    thread t1([&logger]() { logger.thread_function("Message 1"); });
+    t1.join();
     
     //LINKING
     //channel creation
