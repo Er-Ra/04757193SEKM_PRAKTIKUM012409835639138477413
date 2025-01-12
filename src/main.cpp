@@ -18,7 +18,7 @@ void customSender1(SenderClass* sender){
     string message;
     message = "\n hello \n";
     sender->write(message);
-    cout << "\nsender" << sender << "\n"<<endl;
+    cout << "\nsender " << sender << "\n"<<endl;
 }
 
 void customSender2(SenderClass* sender){
@@ -26,7 +26,7 @@ void customSender2(SenderClass* sender){
     for (int i = 0; i < 10; i++){
         sender->write(to_string(i));
     }
-    cout  << "\nsender" << sender << "\n"<<endl;
+    cout  << "\nsender " << sender << "\n"<<endl;
 }
 
 //sender initialization
@@ -58,7 +58,7 @@ int main() {
 
     thread t1([&logger]() { logger.thread_function("Message 1"); });
     t1.join();
-    
+    logger.thread_function("Message 2");
     //LINKING
     //channel creation
     sc->addChannel(1);
@@ -74,7 +74,8 @@ int main() {
     //initialize thread vector
     vector<thread> threads;
 
-    while (true){
+    for (size_t i = 0; i < 10; i++)
+    {
 
         sender1->start(&threads);
         sender2->start(&threads);
