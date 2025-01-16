@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -12,7 +11,6 @@
 class ManualMutex {
 public:
     void lock();
-
     void unlock();
 
 private:
@@ -69,12 +67,13 @@ private:
     ManualMutex manual_mutex;   //for file as well as queue
     std::thread log_thread;
     std::atomic<bool> stop_logging; //Shutdown safely flag
-    const std::string& base_filename; //standard file name before addition of count
+    const std::string base_filename; //standard file name before addition of count
     int current_file_length;    //length of the file currently beeing written
     int max_file_length_byte;   //maximum length of one file
     const bool new_file;  //should a new file be created by overflow?
     int max_log_size_byte;   //maximum general size independent of individual file size
     int number_of_file; //current number of log files created
+    const std::string data_type;
 
     AsyncLogger(const std::string& filename, const int file_length_byte, const bool new_file_or_overwrite, int log_size);
 
