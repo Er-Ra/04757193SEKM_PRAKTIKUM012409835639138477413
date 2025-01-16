@@ -7,8 +7,15 @@ public:
         return format == "int";
     }
 
-    TranslatedMessage* createMessage(std::string message) const override {
+    Message* createMessage(std::string message) const override {
         //Logik, um die Nachticht umzusetzen
-        return new IntMessage(std::stoi(message));
+        try {
+            int value = std::stoi(message); // Attempt to convert the string to an integer
+            return new IntMessage(value);
+        } catch (const std::invalid_argument& e) {
+            // Handle the case where the string is not a valid integer
+            std::cerr << "Invalid message format: not a number. Message: " << message << std::endl;
+        }
+        return new IntMessage(0);
     }
 };

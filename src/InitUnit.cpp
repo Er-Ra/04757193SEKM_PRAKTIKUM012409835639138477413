@@ -11,8 +11,8 @@ InitUnit* InitUnit::getInitUnit(){
 
 void InitUnit::initializeChannels(){
     SharedChannels* sc = SharedChannels::getSharedChannels();
-    sc->addChannel(1,5,5); //ID, slotCount, slotLen
-    sc->addChannel(2,5,5);
+    sc->addChannel(1,10,10); //ID, slotCount, slotLen
+    sc->addChannel(2,10,10);
 }
 
 InitUnit::InitUnit(){

@@ -7,7 +7,7 @@ public:
         return format == "string";
     }
 
-    TranslatedMessage* createMessage(std::string message) const override {
+    Message* createMessage(std::string message) const override {
         //Logik, um die Nachticht umzusetzen
         return new StringMessage(message);
     }

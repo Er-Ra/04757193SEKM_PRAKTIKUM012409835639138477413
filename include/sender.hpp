@@ -6,8 +6,7 @@
 #include <vector>
 #include <thread>
 #include <functional>
-#include "./sharedChannels.hpp"
-#include "./connectUnit.hpp"
+#include "./MPK.hpp"
 
 class SenderClass {
 public:
@@ -20,10 +19,11 @@ public:
     // Member functions
     void joinToChannel(int);
     void start(std::vector<std::thread>* threads);
-    void write(std::string);
+    void write(const char*);
 
 private:
     // Member variables
+    MPK* myMPK;
     int senderID;
     std::vector<int> joinedChannels;
 

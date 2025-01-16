@@ -6,9 +6,7 @@
 #include <vector>
 #include <thread>
 #include <functional>
-#include "./sharedChannels.hpp"
-#include "./connectUnit.hpp"
-#include "./translatedMessage.hpp"
+#include "./MPK.hpp"
 
 class ReceiverClass {
 public:
@@ -21,14 +19,16 @@ public:
     // Member functions
     void joinToChannel(int);
     void start(std::vector<std::thread>* threads);
-    TranslatedMessage* read();
+    Message* read();
     
 private:
     // Variables
+    MPK* myMPK;
     int receiverID;
     std::vector<int> joinedChannels;
+    std::vector<int> channelKeys;
     std::string receiverFormat;
-    TranslatedMessage* receiverMessage;
+    Message* receiverMessage;
 
     // Functions
     std::function<void(ReceiverClass*)> grayFunc;

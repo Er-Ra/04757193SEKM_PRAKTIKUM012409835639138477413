@@ -1,8 +1,8 @@
-#include "../../include/translatedMessage.hpp"
+#include "../../include/message.hpp"
 #include <iostream>
 #include <string>
 
-class StringMessage : public TranslatedMessage {
+class StringMessage : public Message {
     std::string value;
 public:
     StringMessage(const std::string val) : value(val) {}

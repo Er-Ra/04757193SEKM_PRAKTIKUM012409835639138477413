@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include "./translatedMessage.hpp"
+#include "./message.hpp"
 
 class TranslatedMessageFactory {
 public:
@@ -13,7 +13,7 @@ public:
     virtual bool canHandle(std::string) const = 0;
 
     // Creates the TranslatedMessage for the given format
-    virtual TranslatedMessage* createMessage(std::string) const = 0;
+    virtual Message* createMessage(std::string) const = 0;
 };
 
 #endif // TRANSLATED_MESSAGE_FACTORY_CLASS

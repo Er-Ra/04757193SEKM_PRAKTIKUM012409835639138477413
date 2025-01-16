@@ -1,6 +1,6 @@
-#include "../../include/translatedMessage.hpp"
+#include "../../include/message.hpp"
 
-class IntMessage : public TranslatedMessage {
+class IntMessage : public Message {
     int value;
 public:
     IntMessage(int val) : value(val) {}
