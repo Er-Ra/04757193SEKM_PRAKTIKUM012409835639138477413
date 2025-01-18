@@ -1,4 +1,4 @@
-#include "Logger.hpp"
+#include "../include/Logger.hpp"
 
 void ManualMutex::lock() {
     while (flag.test_and_set(std::memory_order_acquire)); // Spin until the lock is acquired
@@ -16,8 +16,8 @@ MutexGuard::~MutexGuard() {
     mutex.unlock();
 }
 
-void LogQueue::push(const std::string& message) {
-    std::shared_ptr<LogNode> new_node = std::make_shared<LogNode>(message);
+void LogQueue::push(const std::string& message, const std:: string& exception) {
+    std::shared_ptr<LogNode> new_node = std::make_shared<LogNode>(message, exception);
     if (!tail) {
         head = tail = new_node;
     } else {
@@ -36,132 +36,48 @@ std::shared_ptr<LogNode> LogQueue::pop() {
     return old_head;
 }
 
-void AsyncLogger::log(const std::string& message) {
-    //convert Data to json format
-    const std::string frm_message = formatLogAsJSON(message);
-
-    //Check message and file length
-    int frm_message_length = frm_message.size();
-    current_file_length += frm_message_length;
-
-    //Check if filesize ok
-    if (frm_message_length + 2 > max_file_length_byte) {
-            std::cout << "file size too small!" << std::endl;
-    }
-    //Check if length with file end is suitable
-    else if ( (current_file_length + 1) < max_file_length_byte) {
-        std::cout << "normal"<< std::endl;
-        MutexGuard guard(manual_mutex);
-        log_queue->push(frm_message);
-    }
-    //Create new file if too long and allowed
-    else if (new_file) {
-        std::cout << "new " + std::to_string(number_of_file) << std::endl;
-        //MutexGuard guard(manual_mutex);
-        close_file();
-        current_file_length = 1;
-        number_of_file++;
-        if (number_of_file * max_file_length_byte >= max_log_size_byte) {
-            std::cout << "overflow files " + std::to_string(current_file_length) << std::endl;
-            number_of_file = 0;
-        }
-        std::string new_filename = base_filename.substr(0, base_filename.length()-6) + std::to_string(number_of_file) + ".json";
-        open_file(new_filename);
-        log_queue->push(frm_message);
-    }
-    //Create Loop to start of Log
-    else if (current_file_length +1 >= max_file_length_byte) {
-        MutexGuard guard(manual_mutex);
-        log_file.seekp(1); // Move to start after opening bracket '['
-        current_file_length = 1 + frm_message_length;
-        std::cout << "Loop " + std::to_string(current_file_length) << std::endl;
-        log_queue->push(frm_message);
-        // Ensure that we wrap correctly
-        if (log_file.tellp() >= static_cast<std::streampos>(max_file_length_byte)) {
-            log_file.seekp(1); // Wrap around to the start
-            current_file_length = 1;
-        }
-    }
-    else {
-        std::cout << "General log size Error" << std::endl;
+bool LogQueue::itemInQueue() {
+    if (!head) {
+        return false;
+    } else {
+        return true;
     }
 }
 
-AsyncLogger::AsyncLogger(const std::string& filename, const int file_length_byte, const bool new_file_or_overwrite, int log_size)
-: stop_logging(false), base_filename(filename), max_file_length_byte(file_length_byte), new_file(new_file_or_overwrite), max_log_size_byte(log_size), number_of_file(0) {
-    open_file(filename);
-    if (max_log_size_byte < max_file_length_byte) { //Check file sizes and set to smaller if log is smaller
-        max_file_length_byte = max_log_size_byte;
-        log_file.open(filename, std::ios::out | std::ios::app);
-        
-        if(!log_file.is_open()){
-            for (long i = 0; !log_file.is_open(); i++)
-            {   log_file.close();
-                std::string filename_i = filename.substr(0,filename.size()-4) + std::to_string(i) +".txt";
-                log_file.open(filename_i, std::ios::out | std::ios::app);
-            }
-        }
-        /*
-        if (!log_file.is_open()) {
-            throw std::ios_base::failure("Failed to open log file");
-        }*/
-
-    }
-    if (!log_file.is_open()) {
-        throw std::ios_base::failure("Failed to open log file");
-    }
-    log_thread = std::thread(&AsyncLogger::processLogs, this);
+std::string XmlDataFormatter::formatData(const std::string& message, const std::string& exception) {
+    // Simple XML formatting
+    auto now = std::chrono::system_clock::now();
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::string time_str = std::ctime(&now_time_t);
+    time_str.pop_back(); // Remove newline character
+    // XML formatting for logging
+    std::string formattedData =
+        "<log>\n"
+        "    <date>" + time_str.substr(0, time_str.find(":")-2) + "</date>\n"
+        "    <time>" + time_str.substr(time_str.find(":")-2, time_str.size()) + "</time>\n"
+        "    <message>" + message + "</message>\n"
+        "    <exception>" + exception + "</exception>\n"
+        "</log>\n";
+    return formattedData;
 }
 
-AsyncLogger::~AsyncLogger() {
-    stop_logging.store(true, std::memory_order_release);
-    if (log_thread.joinable()) {
-        log_thread.join();
-    }
-    MutexGuard guard(manual_mutex);
-    if (log_file.is_open()) {
-        close_file();
-    }
-}
-
-//File closing routine
-void AsyncLogger::close_file() {
-    log_file.seekp(-3, std::ios_base::end);
-    log_file << "]";
-    log_file.close();
-}
-
-//File opening routine
-void AsyncLogger::open_file(const std::string& new_filename) {
-    log_file.open(new_filename, std::ios::out);
-    log_file.seekp(0);
-    log_file << "["; //Start of JSON Array
-}
 
 //Translate data to JSON
-std::string AsyncLogger::formatLogAsJSON(const std::string& message, const std::string& exception) {
+std::string JsonDataFormatter::formatData(const std::string& message, const std::string& exception) {
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
     std::string time_str = std::ctime(&now_time_t);
     time_str.pop_back(); // Remove newline character
     std::string json_log = "{";
-
-    // Manually construct the JSON string
-    // if(current_file_length > 5) {
-    //     json_log = ",{";
-    // }
-    // else {
-    //     json_log = "{";
-    // }
     json_log += "\"timestamp\": \"" + time_str + "\",";
     json_log += "\"message\": \"" + escapeJSONString(message) + "\",";
     json_log += "\"exception\": \"" + escapeJSONString(exception) + "\"";
-    json_log += "},";
+    json_log += "},\n";
     return json_log;
 }
 
 //adjust string to json format
-std::string AsyncLogger::escapeJSONString(const std::string& str) {
+std::string JsonDataFormatter::escapeJSONString(const std::string& str) {
     std::string escaped_str;
     for (char c : str) {
         switch (c) {
@@ -179,25 +95,145 @@ std::string AsyncLogger::escapeJSONString(const std::string& str) {
     return escaped_str;
 }
 
-void AsyncLogger::processLogs() {
-    while (!stop_logging.load(std::memory_order_acquire)) {
-        {
-            MutexGuard guard(manual_mutex);
-            auto node = log_queue->pop();
-            if (node) {
-                log_file << node->message << std::endl;
-            }
-        }
+std::unique_ptr<DataFormatter> DataFormatterFactory::createFormatter(const std::string& type) {
+    if (type == ".xml") {
+        return std::make_unique<XmlDataFormatter>();
+    } else if (type == ".json") {
+        return std::make_unique<JsonDataFormatter>();
+    }
+    return nullptr;
+}
 
-        // Introduce a small sleep to reduce CPU usage
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+Logger::Logger(const std::string& filename, const unsigned int file_length_byte, const bool new_file_or_overwrite, const unsigned int log_size_byte)
+: base_filename(filename), max_file_length_byte(file_length_byte), new_file(new_file_or_overwrite), max_log_size_byte(log_size_byte), number_of_file(0) {
+    //Check file sizes and set to smaller if log is smaller
+    if (max_log_size_byte < max_file_length_byte) {
+        max_file_length_byte = max_log_size_byte;
+    }
+
+    //Determine file type
+    if (base_filename.find(".json") != std::string::npos) {
+        data_type = ".json";
+    }
+    else if (base_filename.find(".xml") != std::string::npos) {
+        data_type = ".xml";
+    }
+    else {
+        data_type = ".json";
+        std::cout << "File type not supported! .json auto selected" << std::endl;
+    }
+
+    formatter = DataFormatterFactory::createFormatter(data_type);
+
+    open_file(filename);
+}
+
+Logger::~Logger() {
+    while(log_queue->itemInQueue()){
+        processLogs();
+    }
+    if (log_file.is_open()) {
+        close_file();
     }
 }
 
-
-void thread_function(AsyncLogger& logger, const std::string& message) {
-for (int i = 0; i < 5; ++i) {
-    logger.log(message + " from thread " + std::to_string(i));
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+void Logger::log(const std::string& message, const std::string& exception) {
+    //MutexGuard guard(manual_mutex);
+    log_queue->push(message, exception);
+    processLogs();
 }
+
+//File opening routine
+void Logger::open_file(const std::string& new_filename) {
+    if(log_file.is_open()) {
+        log_file.close();
+    }
+
+    MutexGuard guard(manual_mutex);
+    log_file.open(new_filename, std::ios::out);
+    log_file.seekp(0);
+    if (data_type == ".json"){
+        log_file << "["; //Start of JSON Array
+        current_file_length = 1;
+    }
+    else if (data_type == ".xml") {
+        log_file << xml_header;
+        current_file_length = xml_header.size();
+    }
+}
+
+//File closing routine
+void Logger::close_file() {
+    MutexGuard guard(manual_mutex);
+    if ( data_type == ".json"){
+        log_file.seekp(-3, std::ios_base::end);
+        log_file << "]"; //End of JSON Array
+    }
+    log_file.close();
+}
+
+void Logger::writetoFile(const std::string& Log) {
+    MutexGuard guard(manual_mutex);
+    log_file << Log;
+}
+
+void Logger::processLogs() {
+    if (log_queue->itemInQueue()){
+        auto node = log_queue->pop();
+        if (node) {
+            //Convert Data to format
+            const std::string frm_message = formatter->formatData(node->message, node->exception);
+
+            //Check message and file length
+            unsigned frm_message_length = frm_message.size();
+            current_file_length += frm_message_length;
+
+            //Check if filesize ok
+            if (frm_message_length + 2 > max_file_length_byte) {
+                    std::cout << "file size too small!" << std::endl;
+            }
+
+            //Check if length with file end is suitable
+            else if ( (current_file_length + 1) < max_file_length_byte) {
+                writetoFile(frm_message);
+            }
+
+            //Create new file if too long and allowed
+            else if (new_file) {
+                number_of_file++;
+                //Check maximum total Log size and loop if necessary
+                if (number_of_file * max_file_length_byte >= max_log_size_byte) {
+                    std::cout << "overflow files " + std::to_string(current_file_length) << std::endl;
+                    number_of_file = 0;
+                }
+                //Get number of file
+                std::string number = std::to_string(number_of_file);
+                //Create new file name
+                std::string new_filename = base_filename.substr(0, base_filename.length()-(unsigned int)(number.size() + data_type.size())) + number + data_type;
+                //Close full file
+                close_file();
+                //Open new file and start writing
+                open_file(new_filename);
+                //Reset Length counter and increment number of file
+                current_file_length += frm_message_length;
+                writetoFile(frm_message);
+            }
+
+            //Create Loop to start of Log
+            else if (current_file_length +1 >= max_file_length_byte) {
+                if (data_type == ".xml") {
+                    unsigned int start_pos = xml_header.size();
+                    log_file.seekp(start_pos);
+                    current_file_length = start_pos + frm_message_length;
+                } else {            // Move to start after opening bracket '['
+                    log_file.seekp(1);
+                    current_file_length = 1 + frm_message_length;
+                }
+                writetoFile(frm_message);
+            }
+            else {
+                std::cout << "General log size Error" << std::endl;
+            }
+        }
+    }
 }
