@@ -9,16 +9,18 @@
 #include "./initUnit.hpp"
 #include "../src/messageFormats/intMessage.cpp"
 #include "../src/messageFormats/strMessage.cpp"
+#include "../src/messageFormats/senderFeedbackMessage.cpp"
 
 class MPK{
 public:
     static MPK* getMPK();
     //Functions
     void initializeMPK();
+    void deleteChannel(int);
     void connectReceiverToChannel(int, std::vector<int>*, std::vector<int>*);
     void connectSenderToChannel(int, std::vector<int>*);
     Message* readFromChannel(int, std::string, int);
-    void writeToChannel(int, const char*);
+    Message* writeToChannel(int, const char*);
 
 private:
     static MPK* myMPK;

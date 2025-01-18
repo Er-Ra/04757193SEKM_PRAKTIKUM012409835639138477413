@@ -1,6 +1,5 @@
 //RecvUnit
 #include "../include/receiver.hpp"
-#include "../include/sharedMutex.hpp"
 
 ReceiverClass::ReceiverClass(int receiverID, std::string receiverFormat, std::function<void(ReceiverClass*)> grayFunc){
     this->myMPK = MPK::getMPK();
@@ -20,11 +19,18 @@ Message* ReceiverClass::read(){
         int key = this->channelKeys[channelNumber];
         message = myMPK->readFromChannel(channelID, this->receiverFormat, key);
     }
-    return message;
+    if(message != nullptr)
+        return message;
+    else
+        return nullptr;
 }
 
 void ReceiverClass::start(std::vector<std::thread>* threads){
     threads->emplace_back(std::thread([this]() { this->grayFunc(this); }));
+}
+
+void ReceiverClass::deleteChannel(int channelID){
+    myMPK->deleteChannel(channelID);
 }
 
 ReceiverClass::~ReceiverClass(){

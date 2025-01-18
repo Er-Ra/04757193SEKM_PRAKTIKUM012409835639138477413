@@ -7,8 +7,8 @@ public:
         return format == "string";
     }
 
-    Message* createMessage(std::string message) const override {
+    Message* createMessage(const char* message) const override {
         //Logik, um die Nachticht umzusetzen
-        return new StringMessage(message);
+        return new StringMessage(std::string(message));
     }
 };

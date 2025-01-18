@@ -1,6 +1,6 @@
-#include "sender.hpp"
-#include "receiver.hpp"
-#include "MPK.hpp"
+#include "../include/sender.hpp"
+#include "../include/receiver.hpp"
+#include "../include/MPK.hpp"
 #include <vector>
 #include <thread>
 #include <iostream>
@@ -20,7 +20,7 @@ private:
     static void customSender1(SenderClass* sender) {
         while (true) {
             const char* message;
-            message = "hello";
+            message = "helloComoEstasLoquillooo";
             sender->write(message);
         }
     }
@@ -43,8 +43,11 @@ private:
     // Define grayFuncs for receivers
     static void customReceiver1(ReceiverClass* receiver) {
         while (true) {
-            StringMessage message = *(StringMessage*)receiver->read();
-            std::cout << "Mensaje recibido: " << message.getValue() << std::endl;
+            Message* messageReceived = receiver->read();
+            if(messageReceived != nullptr){
+                StringMessage message = *(StringMessage*)messageReceived;
+                std::cout << "Nachricht empfangen: " << message.getValue() << std::endl;
+            }
         }
     }
 
@@ -54,9 +57,13 @@ private:
 
     static void customReceiver3(ReceiverClass* receiver) {
         while (true) {
-            IntMessage* message = (IntMessage*)receiver->read();
-            std::cout << "Mensaje procesado: " << message->getValue() + 1 << std::endl;
-        }
+            Message* messageReceived = receiver->read();
+            if(messageReceived != nullptr){
+                IntMessage* message = (IntMessage*)receiver->read();
+                std::cout << "Nachricht empfangen: " << message->getValue() + 1 << std::endl;
+            }
+            
+        }  
     }
 
 public:
@@ -94,7 +101,6 @@ public:
         // Linking receivers
         receiver1->joinToChannel(1); // Channel ID
         receiver2->joinToChannel(2);
-        receiver3->joinToChannel(2);
 
         // Start threads
         sender1->start(&threads);

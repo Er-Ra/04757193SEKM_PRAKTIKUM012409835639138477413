@@ -7,10 +7,10 @@ public:
         return format == "int";
     }
 
-    Message* createMessage(std::string message) const override {
+    Message* createMessage(const char* message) const override {
         //Logik, um die Nachticht umzusetzen
         try {
-            int value = std::stoi(message); // Attempt to convert the string to an integer
+            int value = std::stoi(std::string(message)); // Attempt to convert the string to an integer
             return new IntMessage(value);
         } catch (const std::invalid_argument& e) {
             // Handle the case where the string is not a valid integer

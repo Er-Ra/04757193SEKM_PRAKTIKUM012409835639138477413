@@ -1,6 +1,5 @@
 //RecvUnit
 #include "../include/sender.hpp"
-#include "../include/sharedMutex.hpp"
 
 SenderClass::SenderClass(int senderID, std::function<void(SenderClass*)> grayFunc){
     this->myMPK = MPK::getMPK();
@@ -12,10 +11,11 @@ void SenderClass::joinToChannel(int channelID){
     myMPK->connectSenderToChannel(channelID, &this->joinedChannels);
 }
 
-void SenderClass::write(const char* message){ 
+void SenderClass::write(const char* message){
     for (int channelNumber = 0; channelNumber < this->joinedChannels.size(); channelNumber++){
         int channelID = this->joinedChannels[channelNumber];
-        myMPK->writeToChannel(channelID, message);
+        SenderFeedbackMessage* senderFeedbackMessage = (SenderFeedbackMessage*)myMPK->writeToChannel(channelID, message);
+        senderFeedbackMessage->getMessageStatus();
     }
 }
 

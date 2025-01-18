@@ -13,6 +13,8 @@ public:
     //Functions
     void connectReceiverToChannel(std::vector<int>*, std::vector<int>*, int);
     void connectSenderToChannel(std::vector<int>*, int);
+    void separateReceiverFromChannel(std::vector<int>*, std::vector<int>*, int);
+    void separateSenderFromChannel(std::vector<int>*, int);
 
 private:
     static ConnectUnit* myConnectUnit;

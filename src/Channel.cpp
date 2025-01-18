@@ -8,23 +8,24 @@ ChannelClass::ChannelClass(int channelID, QueueClass* channelQueue){
     this->factoryPool = new TranslatedMessageFactoryPool();
 }
 
-void ChannelClass::writeToChannel(const char* message){
-    //Bestätigen dass die Nachricht, die Universellenformat hat
-    std::lock_guard<std::mutex> guard(this->channelMutex);
-    if(!this->deleteRequest)
-        this->channelQueue->enqueue(message);
-        //from here on the message can be deleted, because it is now safe in the queue
+ChannelClass::~ChannelClass(){
+    delete this->factoryPool;
+    delete this-> channelQueue;    
 }
 
 bool ChannelClass::get_deleteRequest(){
     return deleteRequest;
 }
 
+void ChannelClass::set_deleteRequest(bool deleteRequest){
+    this->deleteRequest = deleteRequest;
+}
+
 bool ChannelClass::get_isEmpty(){
     return isEmpty;
 }
 
-int ChannelClass::get_ChannelID  (){
+int ChannelClass::get_ChannelID(){
     return channelID;
 }
 
@@ -37,11 +38,24 @@ void ChannelClass::addElementToKeys(int element){
     this->backupKeys.push_back(element);
 }
 
+
+Message* ChannelClass::writeToChannel(const char* message){
+    std::lock_guard<std::mutex> guard(this->channelMutex);
+    TranslatedMessageFactory* factory = this->factoryPool->getFactory("senderFeedbackMessage");
+    if(!this->deleteRequest){
+        const char* senderFeedbackMessage;
+        senderFeedbackMessage = this->channelQueue->enqueue(message);
+        this->isEmpty = false;
+        return factory->createMessage(senderFeedbackMessage);
+    }
+        //from here on the message can be deleted, because it is now safe in the queue
+}
+
 Message* ChannelClass::readFromChannel(std::string receiverFormat, int key){
     std::lock_guard<std::mutex> guard(this->channelMutex);
     TranslatedMessageFactory* factory = this->factoryPool->getFactory(receiverFormat);
     if(!this->channelQueue->get_isEmpty()){
-        std::string message;
+        const char* message;
 
         int position = -1;
         int index = 0;
@@ -53,7 +67,7 @@ Message* ChannelClass::readFromChannel(std::string receiverFormat, int key){
             index++;
         }
         if (position != -1){
-            message = std::string(this->channelQueue->getFront());
+            message = this->channelQueue->getFront();
             this->keys.erase(this->keys.begin() + position);
         }
         if (this->keys.empty()){
@@ -63,7 +77,7 @@ Message* ChannelClass::readFromChannel(std::string receiverFormat, int key){
         
         if(this->channelQueue->get_isEmpty())
             this->isEmpty = true;
-
+        
         return factory->createMessage(message);
     }
     return factory->createMessage("0");

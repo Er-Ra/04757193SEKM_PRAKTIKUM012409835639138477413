@@ -13,7 +13,7 @@ public:
     virtual bool canHandle(std::string) const = 0;
 
     // Creates the TranslatedMessage for the given format
-    virtual Message* createMessage(std::string) const = 0;
+    virtual Message* createMessage(const char*) const = 0;
 };
 
 #endif // TRANSLATED_MESSAGE_FACTORY_CLASS

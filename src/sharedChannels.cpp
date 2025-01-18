@@ -1,5 +1,5 @@
 //MPK (System)
-#include "sharedChannels.hpp"
+#include "../include/sharedChannels.hpp"
 
 SharedChannels* SharedChannels::mySharedChannels = nullptr;
 
@@ -16,6 +16,7 @@ ChannelClass* SharedChannels::getChannel(int channelID){
             return this->channels[i];
         }
     }
+    return nullptr;
 }
 
 std::vector<int> SharedChannels::getChannelIDs(){
@@ -35,11 +36,13 @@ void SharedChannels::addChannel(int channelID, int slotsNumber, int slotNumber){
 }
 
 void SharedChannels::deleteChannel(int channelID){
-    for(int i = 0; i < this->channels.size();i++){
-    if(channelID == this->channels[i]->get_ChannelID())
-        this->channels.erase(this->channels.begin() + i);
-        return ;
+    for(int i = 0; i < this->channels.size(); i++){
+        if(channelID == this->channels[i]->get_ChannelID()){
+            delete this->channels[i];
+            this->channels.erase(this->channels.begin() + i);
+        }
     }
+    return;
 }
 
 SharedChannels::SharedChannels(){

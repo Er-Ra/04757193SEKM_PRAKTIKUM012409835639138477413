@@ -18,7 +18,7 @@ public:
     ~QueueClass();
 
     //Functions
-    void enqueue(const char*); //in die Queue schreiben
+    const char* enqueue(const char*); //in die Queue schreiben
     void dequeue(void); //von der Queue löschen
     const char* getFront(); //von der Queue lesen
     bool get_isEmpty();

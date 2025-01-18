@@ -16,9 +16,10 @@ public:
     // Destructor
     ~ChannelClass();
 
-    void writeToChannel(const char*);
+    Message* writeToChannel(const char*);
     Message* readFromChannel(std::string, int);
     bool get_deleteRequest();
+    void set_deleteRequest(bool);
     bool get_isEmpty();
     int get_ChannelID();
     std::vector<int> get_Keys();

@@ -2,6 +2,7 @@
 #define MESSAGE_CLASS
 
 #include <iostream>
+#include <cstring>
 
 class Message {
 public:

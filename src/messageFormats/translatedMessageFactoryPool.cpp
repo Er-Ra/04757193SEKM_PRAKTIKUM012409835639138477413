@@ -1,12 +1,15 @@
 #include "../../include/translatedMessageFactoryPool.hpp"
 #include "./intMessageFactory.cpp"
 #include "./strMessageFactory.cpp"
+#include "./senderFeedbackMessageFactory.cpp"
 
 TranslatedMessageFactoryPool::TranslatedMessageFactoryPool(){
     IntMessageFactory* intMessageFactory = new IntMessageFactory();
     this->addFactory(intMessageFactory);
     StringMessageFactory* stringMessageFactory = new StringMessageFactory();
     this->addFactory(stringMessageFactory);
+    SenderFeedbackMessageFactory* senderFeedbackMessageFactory = new SenderFeedbackMessageFactory();
+    this->addFactory(senderFeedbackMessageFactory);
 }
 
 void TranslatedMessageFactoryPool::addFactory(TranslatedMessageFactory* factory){

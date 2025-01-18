@@ -9,7 +9,7 @@ ConnectUnit* ConnectUnit::getConnectUnit(){
     return ConnectUnit::myConnectUnit;
 }
 
-void ConnectUnit::connectReceiverToChannel(std::vector<int>* receiverVector, std::vector<int>* keyVector,int channelID){
+void ConnectUnit::  connectReceiverToChannel(std::vector<int>* receiverVector, std::vector<int>* keyVector,int channelID){
     SharedChannels* sc = SharedChannels::getSharedChannels();
     std::vector<int> channelIDs;
     bool channelExists = false;
@@ -32,18 +32,20 @@ void ConnectUnit::connectReceiverToChannel(std::vector<int>* receiverVector, std
 
 void ConnectUnit::connectSenderToChannel(std::vector<int>* senderVector, int channelID){
     SharedChannels* sc = SharedChannels::getSharedChannels();
-    std::vector<int> channelIDs;
-    bool channelExists = false;  
-    channelIDs = sc->getChannelIDs();
-    for(int channelNumber = 0; channelNumber < channelIDs.size(); channelNumber++){ //Verify that channel exists
-        if(channelID == channelIDs[channelNumber]){
-            channelExists = true;
-            senderVector->push_back(channelID);
-        }
+    if(sc->getChannel(channelID) != nullptr){
+        senderVector->push_back(channelID);
     }
-    if(!channelExists)
+    else
         std::cout << "Channel with ID " << channelID << " is non-existant" << std::endl;
         //add eventually C2b
+}
+
+void ConnectUnit::separateReceiverFromChannel(std::vector<int>* receiverVector, std::vector<int>* keyVector,int channelID){
+
+}
+
+void ConnectUnit::separateSenderFromChannel(std::vector<int>* senderVector, int channelID){
+
 }
 
 ConnectUnit::ConnectUnit(){

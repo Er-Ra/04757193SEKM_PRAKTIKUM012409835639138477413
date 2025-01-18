@@ -20,6 +20,7 @@ public:
     void joinToChannel(int);
     void start(std::vector<std::thread>* threads);
     Message* read();
+    void deleteChannel(int);
     
 private:
     // Variables
