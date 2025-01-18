@@ -1,6 +1,6 @@
-#include "../include/sender.hpp"
-#include "../include/receiver.hpp"
-#include "../include/MPK.hpp"
+#include "sender.hpp"
+#include "receiver.hpp"
+#include "MPK.hpp"
 #include <vector>
 #include <thread>
 #include <iostream>

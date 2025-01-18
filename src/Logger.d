@@ -1,1 +1,1 @@
-src/Logger.o: src/Logger.cpp
+src/Logger.o: src/Logger.cpp include/Logger.hpp

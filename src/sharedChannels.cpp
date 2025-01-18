@@ -1,5 +1,5 @@
 //MPK (System)
-#include "../include/sharedChannels.hpp"
+#include "sharedChannels.hpp"
 
 SharedChannels* SharedChannels::mySharedChannels = nullptr;
 

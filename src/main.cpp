@@ -1,7 +1,8 @@
 #include "./App.cpp"
 
 int main() {
-    App myApp;
-    myApp.run();
+    //App myApp;
+    std::cout << "Hallo" << std::endl;
+    //myApp.run();
     return 0;
 }
