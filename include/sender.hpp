@@ -7,27 +7,27 @@
 #include <thread>
 #include <functional>
 #include "./MPK.hpp"
+#include "./communicator.hpp"
 
-class SenderClass {
+class SenderClass : public Communicator {
 public:
     // Constructors
-    SenderClass(int, std::function<void(SenderClass*)>);
+    SenderClass(int id, std::function<void(SenderClass*)> callback);
 
     // Destructor
     ~SenderClass();
 
-    // Member functions
-    void joinToChannel(int);
-    void start(std::vector<std::thread>* threads);
-    void write(const char*);
+    // Overridden methods
+    void joinToChannel(int channelID) override;
+    void start(std::vector<std::thread>* threads) override;
+
+    // Additional methods
+    void write(const char* message);
 
 private:
-    // Member variables
     MPK* myMPK;
     int senderID;
     std::vector<int> joinedChannels;
-
-    // Functions
     std::function<void(SenderClass*)> grayFunc;
 };
 

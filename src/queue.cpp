@@ -43,8 +43,8 @@ const char* QueueClass::enqueue(const char* slot){ //Erwartet im universellen Sy
         try {
             QueueElement* newElement = new QueueElement();
             newElement->data = new char[this->slotLength + 1]; // Allocate memory for the slot data
-            std::memcpy(newElement->data, slot, this->slotLength); // Copy the slot data
-            newElement->data[this->slotLength] = '\0';
+            std::memcpy(lastElement->data, slot, this->slotLength); // Copy the slot data
+            lastElement->data[this->slotLength] = '\0';
             this->lastElement->nextElement = newElement;
             this->lastElement = newElement;
 

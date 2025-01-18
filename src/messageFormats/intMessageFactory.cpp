@@ -15,7 +15,7 @@ public:
         } catch (const std::invalid_argument& e) {
             // Handle the case where the string is not a valid integer
             std::cerr << "Invalid message format: not a number. Message: " << message << std::endl;
+            return new IntMessage(10);
         }
-        return new IntMessage(0);
     }
 };

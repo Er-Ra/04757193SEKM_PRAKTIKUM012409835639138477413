@@ -7,7 +7,6 @@
 #include <mutex>
 #include "./queue.hpp"
 #include "./translatedMessageFactoryPool.hpp"
-#include "./Logger.hpp"
 
 class ChannelClass{
 public:
@@ -35,7 +34,6 @@ private:
     std::mutex channelMutex;
     std::vector<int> keys;
     std::vector<int> backupKeys;
-    Logger* logger;
 };
 
 #endif // CHANNEL_CLASS

@@ -6,8 +6,6 @@ ChannelClass::ChannelClass(int channelID, QueueClass* channelQueue){
     this->channelQueue = channelQueue;
     this->deleteRequest = false;
     this->factoryPool = new TranslatedMessageFactoryPool();
-    std::string fileName = "loggerChannel-" + std::to_string(channelID);
-    this->logger = new Logger(fileName, 1000, false, 20000);
 }
 
 ChannelClass::~ChannelClass(){
@@ -44,7 +42,6 @@ void ChannelClass::addElementToKeys(int element){
 Message* ChannelClass::writeToChannel(const char* message){
     std::lock_guard<std::mutex> guard(this->channelMutex);
     TranslatedMessageFactory* factory = this->factoryPool->getFactory("senderFeedbackMessage");
-    logger->log("die Nachricht " + std::string(message) + " wird geschrieben " + " in den Kanal " + std::to_string(channelID));
     if(!this->deleteRequest){
         const char* senderFeedbackMessage;
         senderFeedbackMessage = this->channelQueue->enqueue(message);
@@ -77,7 +74,6 @@ Message* ChannelClass::readFromChannel(std::string receiverFormat, int key){
             this->channelQueue->dequeue();
             this->keys = this->backupKeys;
         }
-        
         if(this->channelQueue->get_isEmpty())
             this->isEmpty = true;
         

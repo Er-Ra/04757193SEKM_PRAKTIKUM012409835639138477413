@@ -9,7 +9,7 @@ ConnectUnit* ConnectUnit::getConnectUnit(){
     return ConnectUnit::myConnectUnit;
 }
 
-void ConnectUnit::  connectReceiverToChannel(std::vector<int>* receiverVector, std::vector<int>* keyVector,int channelID){
+void ConnectUnit::connectReceiverToChannel(std::vector<int>* receiverVector, std::vector<int>* keyVector,int channelID){
     SharedChannels* sc = SharedChannels::getSharedChannels();
     std::vector<int> channelIDs;
     bool channelExists = false;

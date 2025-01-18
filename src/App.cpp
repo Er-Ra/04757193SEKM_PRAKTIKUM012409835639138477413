@@ -1,6 +1,5 @@
-#include "../include/sender.hpp"
-#include "../include/receiver.hpp"
 #include "../include/MPK.hpp"
+#include "./communicatorFactory.cpp"
 #include <vector>
 #include <thread>
 #include <iostream>
@@ -9,25 +8,19 @@
 class App {
 private:
     MPK* myMPK;
-    SenderClass* sender1;
-    SenderClass* sender2;
-    ReceiverClass* receiver1;
-    ReceiverClass* receiver2;
-    ReceiverClass* receiver3;
+    std::vector<Communicator*> communicators; // Store raw pointers to senders and receivers
     std::vector<std::thread> threads;
 
     // Define grayFuncs for senders
     static void customSender1(SenderClass* sender) {
         while (true) {
-            const char* message;
-            message = "helloComoEstasLoquillooo";
+            const char* message = "helloComoEstasLoquillooo";
             sender->write(message);
         }
     }
 
     static void customSender2(SenderClass* sender) {
-        const char* message;
-        message = "hello2";
+        const char* message = "hello2";
         sender->write(message);
     }
 
@@ -43,8 +36,9 @@ private:
     // Define grayFuncs for receivers
     static void customReceiver1(ReceiverClass* receiver) {
         while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             Message* messageReceived = receiver->read();
-            if(messageReceived != nullptr){
+            if (messageReceived != nullptr) {
                 StringMessage message = *(StringMessage*)messageReceived;
                 std::cout << "Nachricht empfangen: " << message.getValue() << std::endl;
             }
@@ -57,13 +51,13 @@ private:
 
     static void customReceiver3(ReceiverClass* receiver) {
         while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             Message* messageReceived = receiver->read();
-            if(messageReceived != nullptr){
+            if (messageReceived != nullptr) {
                 IntMessage* message = (IntMessage*)receiver->read();
                 std::cout << "Nachricht empfangen: " << message->getValue() + 1 << std::endl;
             }
-            
-        }  
+        }
     }
 
 public:
@@ -71,43 +65,39 @@ public:
     App() {
         myMPK = MPK::getMPK();
 
-        // Initialize senders
-        sender1 = new SenderClass(1, customSender1);
-        sender2 = new SenderClass(2, customSender3);
+        // Initialize senders using factory
+        communicators.push_back(CommunicatorFactory::createSender(1, customSender1));
+        communicators.push_back(CommunicatorFactory::createSender(2, customSender3));
 
-        // Initialize receivers
-        receiver1 = new ReceiverClass(1, "string", customReceiver1);
-        receiver2 = new ReceiverClass(2, "int", customReceiver3);
-        receiver3 = new ReceiverClass(2, "int", customReceiver3);
+        // Initialize receivers using factory
+        communicators.push_back(CommunicatorFactory::createReceiver(1, "string", customReceiver1));
+        communicators.push_back(CommunicatorFactory::createReceiver(2, "int", customReceiver3));
+        communicators.push_back(CommunicatorFactory::createReceiver(3, "int", customReceiver3));
     }
 
-    // Destructor to clean up resources
+    // Destructor
     ~App() {
-        delete sender1;
-        delete sender2;
-        delete receiver1;
-        delete receiver2;
-        delete receiver3;
+        // Clean up dynamically allocated communicators
+        for (auto communicator : communicators) {
+            delete communicator; // Delete each communicator
+        }
     }
 
     void run() {
         // Initialize MPK
         myMPK->initializeMPK();
 
-        // Linking senders
-        sender1->joinToChannel(1); // Channel ID
-        sender2->joinToChannel(2);
+        // Linking communicators
+        communicators[0]->joinToChannel(1); // Sender1 to channel 1
+        communicators[1]->joinToChannel(2); // Sender2 to channel 2
+        communicators[2]->joinToChannel(1); // Receiver1 to channel 1
+        communicators[3]->joinToChannel(2); // Receiver2 to channel 2
+        communicators[4]->joinToChannel(2); // Receiver2 to channel 2
 
-        // Linking receivers
-        receiver1->joinToChannel(1); // Channel ID
-        receiver2->joinToChannel(2);
-
-        // Start threads
-        sender1->start(&threads);
-        sender2->start(&threads);
-        receiver1->start(&threads);
-        receiver2->start(&threads);
-        receiver3->start(&threads);
+        // Start all communicators
+        for (auto communicator : communicators) {
+            communicator->start(&threads);
+        }
 
         // Keep the application running
         while (true) {

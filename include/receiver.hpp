@@ -7,31 +7,31 @@
 #include <thread>
 #include <functional>
 #include "./MPK.hpp"
+#include "./communicator.hpp"
 
-class ReceiverClass {
+class ReceiverClass : public Communicator {
 public:
     // Constructors
-    ReceiverClass(int, std::string, std::function<void(ReceiverClass*)>);
+    ReceiverClass(int id, std::string format, std::function<void(ReceiverClass*)> callback);
 
     // Destructor
     ~ReceiverClass();
 
-    // Member functions
-    void joinToChannel(int);
-    void start(std::vector<std::thread>* threads);
+    // Overridden methods
+    void joinToChannel(int channelID) override;
+    void start(std::vector<std::thread>* threads) override;
+
+    // Additional methods
     Message* read();
-    void deleteChannel(int);
-    
+    void deleteChannel(int channelID);
+
 private:
-    // Variables
     MPK* myMPK;
     int receiverID;
     std::vector<int> joinedChannels;
     std::vector<int> channelKeys;
     std::string receiverFormat;
     Message* receiverMessage;
-
-    // Functions
     std::function<void(ReceiverClass*)> grayFunc;
 };
 
