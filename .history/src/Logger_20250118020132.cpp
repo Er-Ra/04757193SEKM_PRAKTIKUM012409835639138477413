@@ -236,3 +236,31 @@ void Logger::processLogs() {
         }
     }
 }
+
+void thread_function(Logger& logger, const std::string& message) {
+    for (int i = 0; i < 5; ++i) {
+        logger.log(message + " Message " + std::to_string(i));
+    logger.processLogs();
+    }
+}
+
+int main() {
+    //Logger& logger = Logger::getInstance("log_0.json", 2000, true, 10000);
+    Logger logger("log_0.json", 2000, true, 10000);
+
+    std::thread t1(thread_function, std::ref(logger), "Thread 1");
+    std::thread t2(thread_function, std::ref(logger), "Thread 2");
+    std::thread t3(thread_function, std::ref(logger), "Thread 3");
+    std::thread t4(thread_function, std::ref(logger), "Thread 4");
+    std::thread t5(thread_function, std::ref(logger), "Thread 5");
+    std::thread t6(thread_function, std::ref(logger), "Thread 6");
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+
+    return 0;
+}

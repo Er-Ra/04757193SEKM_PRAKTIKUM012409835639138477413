@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -6,13 +5,6 @@
 #include <memory>
 #include <chrono>
 #include <ctime>
-/****************************************************************************************************** */
-/****************************************************************************************************** */
-//Create a Class instance of Logger: Logger Log("yourfilename.json", filelenght, newfilecreation?, maxsizeoverall)
-//Log by calling Log.log("message", "Exceptions")
-//Regularly call Log.processLogs(); to compile and write to file
-/****************************************************************************************************** */
-/****************************************************************************************************** */
 
 // ManualMutex implementation remains the same
 class ManualMutex {
